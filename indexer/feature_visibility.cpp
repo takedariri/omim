@@ -230,13 +230,10 @@ namespace
 
     static uint32_t const roundabout = classif().GetTypeByPath({"junction", "roundabout"});
     static uint32_t const internet = classif().GetTypeByPath({"internet_access"});
-    static uint32_t const sponsored = classif().GetTypeByPath({"sponsored"});
-    // Reserved for custom event processing, i.e. fc2018.
-    // static uint32_t const event = classif().GetTypeByPath({"event" });
 
     if (g == GEOM_LINE || g == GEOM_UNDEFINED)
     {
-      if (roundabout == type)
+      if (type == roundabout)
         return true;
 
       if (HasRoutingExceptionType(type))
@@ -244,15 +241,8 @@ namespace
     }
 
     ftype::TruncValue(type, 1);
-    if (g != GEOM_LINE)
-    {
-      if (sponsored == type || internet == type)
-        return true;
-
-      // Reserved for custom event processing, i.e. fc2018.
-      //if (event == type)
-      //  return true;
-    }
+    if (g != GEOM_LINE && type == internet)
+      return true;
 
     return false;
   }
@@ -271,6 +261,9 @@ namespace
     static uint32_t const psurface = classif().GetTypeByPath({"psurface"});
     static uint32_t const wheelchair = classif().GetTypeByPath({"wheelchair"});
     static uint32_t const cuisine = classif().GetTypeByPath({"cuisine"});
+    static uint32_t const sponsored = classif().GetTypeByPath({"sponsored"});
+    // Reserved for custom event processing, i.e. fc2018.
+    // static uint32_t const event = classif().GetTypeByPath({"event" });
 
     // Caching type length to exclude generic [wheelchair].
     uint8_t const typeLength = ftype::GetLevel(type);
@@ -278,15 +271,23 @@ namespace
     ftype::TruncValue(type, 1);
     if (g == GEOM_LINE || g == GEOM_UNDEFINED)
     {
-      if (hwtag == type || psurface == type)
+      if (type == hwtag || type == psurface)
         return true;
     }
 
-    if (wheelchair == type && typeLength == 2)
+    if (type == wheelchair && typeLength == 2)
       return true;
 
-    if (cuisine == type)
+    if (type == cuisine)
       return true;
+
+    if (g != GEOM_LINE && type == sponsored)
+      return true;
+
+
+    // Reserved for custom event processing, i.e. fc2018.
+    //if (g != GEOM_LINE && type == event)
+    //  return true;
 
     return false;
   }
